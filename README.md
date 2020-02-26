@@ -2,9 +2,9 @@
 Shopping Cart Solution using Spring Boot and Angular 8
 
 Solution is composed of three projects: 
-  * catalog-services: Spring Boot
-  * shopping-cart-services: Spring Boot
-  * ShoppingCartWeb: Angular 8
+  * catalog-services: Spring Boot 2.2.4
+  * shopping-cart-services: Spring Boot 2.2.4
+  * ShoppingCartWeb: Angular 9
   
 # Installation 
  
