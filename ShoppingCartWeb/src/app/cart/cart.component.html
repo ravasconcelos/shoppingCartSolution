@@ -1,0 +1,26 @@
+<h3>Cart ID:{{ cart.id }}</h3>
+
+<div class="cart-item" *ngFor="let item of cart.items">
+  <span>{{ productMap.get(item.productId).name }}</span>
+  <span>{{ item.price | currency }}</span>
+</div>
+
+<form [formGroup]="checkoutForm" (ngSubmit)="onSubmit(checkoutForm.value)">
+
+  <div>
+    <label for="name">
+      Customer Name
+    </label>
+    <input id="name" type="text" formControlName="name">
+  </div>
+
+  <div>
+    <label for="address">
+      Customer Address
+    </label>
+    <input id="address" type="text" formControlName="address">
+  </div>
+  
+  <button class="button" type="submit">Purchase</button>
+
+</form>
