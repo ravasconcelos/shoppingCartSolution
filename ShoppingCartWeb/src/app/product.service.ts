@@ -8,6 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class ProductService {
 
+  productMap = new Map();
+
   constructor(private http: HttpClient) { }
 
   getProducts(): Observable<HttpResponse<Product[]>> {
@@ -24,5 +26,22 @@ export class ProductService {
       { observe: 'response' });
   }
     
-
+  getProductMap() {
+    console.log("getProductMap");
+    if (this.productMap.size==0) {
+      this.getProducts().subscribe(resp => {
+        console.log(resp);
+        const keys = resp.headers.keys();
+        console.log(keys);
+    
+        for (const data of resp.body) {
+          console.log(data);
+          this.productMap.set(data.id, data);
+        }
+      });
+    } else {
+      console.log("this.productMap is already populated");
+    }
+    return this.productMap;
+  }
 }

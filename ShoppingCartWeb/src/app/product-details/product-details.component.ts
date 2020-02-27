@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder } from '@angular/forms';
 import { ProductService } from '../product.service';
 import { CartService } from '../cart.service';
+import { CartItem } from '../cartItem';
 
 @Component({
   selector: 'app-product-details',
@@ -36,17 +37,29 @@ export class ProductDetailsComponent implements OnInit {
     });
   }
 
-  addToCart(product) {
-    this.cartService.addToCart(product);
-    window.alert('Your product has been added to the cart!');
-  }
-
   onSubmit(formData, product) {
     console.log("formData.quantity: "+formData.quantity);
     product.quantity = formData.quantity;
     console.log("product.quantity: "+product.quantity);
-    this.cartService.addToCart(product);
-    window.alert('Your product has been added to the cart!');
+    this.addToCart(product);
   }
 
+  addToCart(product) {
+
+    var cartItem: CartItem = new CartItem();
+    cartItem.cartId = +this.cartService.getStoredCartId();
+    cartItem.productId = product.id;
+    cartItem.price = product.price;
+    cartItem.quantity = product.quantity;
+
+    console.log('CartService.addToCart will call createCartItem');
+    this.cartService.createCartItem(cartItem).subscribe(resp => {
+      console.log(resp);
+      const keys = resp.headers.keys();
+      console.log(keys);
+      console.log(resp.body);
+      window.alert('Your product has been added to the cart!');
+    });
+    console.log('CartService.addToCart finished');
+  }  
 }

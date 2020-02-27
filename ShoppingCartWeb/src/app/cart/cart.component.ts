@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from "@angular/router";
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { CartService } from '../cart.service';
+import { ProductService } from '../product.service';
 import { Cart } from '../cart';
 import { Product } from '../product';
 
@@ -9,41 +9,32 @@ import { Product } from '../product';
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnChanges {
 
-  items;
   productMap: Map<string, Product>;
   cart: Cart;
   mySubscription: any;
 
   constructor(
     private cartService: CartService,
-    private router: Router
+    private productService: ProductService,
   ) {   
 
   }
 
-  ngOnInit() {
-    this.items = this.cartService.getItems();
-    this.productMap = this.cartService.getProductMap();
-    this.cart = this.cartService.getShoppingCart();
+  ngOnChanges() {
+    this.getShoppingCart();
   }
 
-  ngOnDestroy() {
-    if (this.mySubscription) {
-      this.mySubscription.unsubscribe();
-    }
-  }
-  
-  onSubmit(customerData) {
-    // Process checkout data here
-    this.items = this.cartService.clearCart();
-    console.warn('Your order has been submitted', customerData);
+  ngOnInit() {
+    this.productMap = this.productService.getProductMap();
+    this.getShoppingCart();
   }
 
   removeFromCart(item) {
     this.cartService.removeFromCart(item);
     window.alert('Your product has been removed from the cart!');
+    this.getShoppingCart();
   }
 
   updateCartItem(item, event) {
@@ -51,10 +42,19 @@ export class CartComponent implements OnInit {
     console.log("item.quantity: "+item.quantity);
     this.cartService.updateQuantity(item);
     window.alert('Your product has been updated in the cart!');
+    this.getShoppingCart();
   }
 
-  async delay(ms: number) {
-    await new Promise(resolve => setTimeout(()=>resolve(), ms)).then(()=>console.log("fired"));
+  getShoppingCart() {
+    console.log('CartService.getShoppingCart');
+    this.cartService.getCart(+this.cartService.getStoredCartId()).subscribe(resp => {
+      console.log(resp);
+      const keys = resp.headers.keys();
+      console.log(keys);
+      this.cart = resp.body;
+      console.log(resp.body);
+    });
+    console.log('CartService.getShoppingCart finished');
+    return this.cart;
   }
-
 }

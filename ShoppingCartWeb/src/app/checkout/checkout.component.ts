@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
 import { FormBuilder } from '@angular/forms';
 import { CartService } from '../cart.service';
+import { ProductService } from '../product.service';
 import { Cart } from '../cart';
 import { Product } from '../product';
 
@@ -12,13 +13,13 @@ import { Product } from '../product';
 })
 export class CheckoutComponent implements OnInit {
 
-  items;
   productMap: Map<string, Product>;
   cart: Cart;
   checkoutForm;
 
   constructor(
     private cartService: CartService,
+    private productService: ProductService,
     private formBuilder: FormBuilder,
     private router: Router
   ) { 
@@ -29,9 +30,8 @@ export class CheckoutComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.items = this.cartService.getItems();
-    this.productMap = this.cartService.getProductMap();
-    this.cart = this.cartService.getShoppingCart();
+    this.productMap = this.productService.getProductMap();
+    this.cart = this.getShoppingCart();
   }
 
   onSubmit(customerData) {
@@ -44,8 +44,21 @@ export class CheckoutComponent implements OnInit {
 
       console.log('CartService.submitOrder will call getShoppingCart');
       window.alert('Your order has been submitted!');
-      this.cart = this.cartService.getShoppingCart();
+      this.cart = this.getShoppingCart();
       this.router.navigateByUrl('/order');
     });
+  }
+
+  getShoppingCart() {
+    console.log('CartService.getShoppingCart');
+    this.cartService.getCart(+this.cartService.getStoredCartId()).subscribe(resp => {
+      console.log(resp);
+      const keys = resp.headers.keys();
+      console.log(keys);
+      this.cart = resp.body;
+      console.log(resp.body);
+    });
+    console.log('CartService.getShoppingCart finished');
+    return this.cart;
   }
 }

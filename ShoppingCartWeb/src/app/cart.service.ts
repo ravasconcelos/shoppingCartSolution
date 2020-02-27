@@ -12,32 +12,26 @@ import { Observable } from 'rxjs';
 export class CartService {
 
   constructor(private http: HttpClient) { 
-    console.log('CartService.constructor');
 
-    let storedCartId = localStorage.getItem('cartId');
-    console.log('storedCartId: '+storedCartId);
+    let storedCartId = this.getStoredCartId();
     if (storedCartId == null) {
       this.createCart().subscribe(resp => {
         console.log(resp);
         const keys = resp.headers.keys();
         console.log(keys);
     
-        this.cart = resp.body;
-        console.log(this.cart);
-        localStorage.setItem('cartId', ""+this.cart.id);
+        let cart = resp.body;
+        console.log(cart);
+        localStorage.setItem('cartId', ""+cart.id);
       });
-    } else {
-      this.cart = new Cart();
-      this.cart.id = +storedCartId;
-      this.getShoppingCart();
     }
-
-    console.log('CartService.constructor finished');
   }
 
-  cart: Cart;
-  items = [];
-  productMap = new Map();
+  getStoredCartId() {
+    let storedCartId = localStorage.getItem('cartId');
+    console.log('storedCartId: '+storedCartId);
+    return storedCartId;
+  }
 
   createCart(): Observable<HttpResponse<Cart>> {
     console.log('CartService.createCart will trigger Backend');
@@ -81,30 +75,6 @@ export class CartService {
       { observe: 'response' });
   }
 
-  addToCart(product: Product) {
-
-    var cartItem: CartItem = new CartItem();
-    cartItem.cartId = this.cart.id;
-    cartItem.productId = product.id;
-    cartItem.price = product.price;
-    cartItem.quantity = product.quantity;
-    this.cart.items.push(cartItem);
-
-    console.log('CartService.addToCart will call createCartItem');
-    this.createCartItem(cartItem).subscribe(resp => {
-      console.log(resp);
-      const keys = resp.headers.keys();
-      console.log(keys);
-      this.cart = resp.body;
-      console.log(this.cart);
-    });
-    console.log('CartService.addToCart finished');
-
-    this.items = this.cart.items;
-
-    this.productMap.set(product.id, product);
-  }
-  
   removeFromCart(cartItem: CartItem) {
 
     console.log('CartService.removeFromCart will call removeCartItem');
@@ -127,43 +97,15 @@ export class CartService {
       console.log(resp.body);
     });
 
-    console.log('CartService.updateQuantity will call getShoppingCart');
-
-    this.getShoppingCart();
-
     console.log('CartService.updateQuantity finished');
   }
   
-  getItems() {
-    return this.items;
-  }
-
-  getProductMap() {
-    console.log("this.productMap: "+this.productMap);
-    return this.productMap;
-  }
-  
-  getShoppingCart() {
-    console.log('CartService.getShoppingCart');
-    this.getCart(this.cart.id).subscribe(resp => {
-      console.log(resp);
-      const keys = resp.headers.keys();
-      console.log(keys);
-      this.cart = resp.body;
-      console.log(this.cart);
-    });
-    console.log('CartService.getShoppingCart finished');
-    return this.cart;
-  }
-
   clearCart() {
 
     console.log('clearCart');
     this.createCart().subscribe(resp => {
-      this.cart = resp.body;
-      this.items = this.cart.items;
-      console.log(this.cart);
-      localStorage.setItem('cartId', ""+this.cart.id);
+      console.log(resp.body);
+      localStorage.setItem('cartId', ""+resp.body.id);
       console.log('clearCart createCart finished');
     });
     console.log('clearCart finished');
