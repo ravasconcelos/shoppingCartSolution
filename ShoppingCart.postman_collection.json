@@ -44,6 +44,35 @@
 			"response": []
 		},
 		{
+			"name": "Submit Cart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8200/shoppingcart-api/carts/4/submit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8200",
+					"path": [
+						"shoppingcart-api",
+						"carts",
+						"4",
+						"submit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Update Cart Item",
 			"request": {
 				"method": "PUT",
