@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { Router } from "@angular/router";
 import { CartService } from '../cart.service';
 import { Cart } from '../cart';
 import { Product } from '../product';
@@ -14,16 +14,13 @@ export class CartComponent implements OnInit {
   items;
   productMap: Map<string, Product>;
   cart: Cart;
-  checkoutForm;
+  mySubscription: any;
 
   constructor(
     private cartService: CartService,
-    private formBuilder: FormBuilder,
-  ) { 
-    this.checkoutForm = this.formBuilder.group({
-      name: '',
-      address: ''
-    });
+    private router: Router
+  ) {   
+
   }
 
   ngOnInit() {
@@ -32,11 +29,32 @@ export class CartComponent implements OnInit {
     this.cart = this.cartService.getShoppingCart();
   }
 
+  ngOnDestroy() {
+    if (this.mySubscription) {
+      this.mySubscription.unsubscribe();
+    }
+  }
+  
   onSubmit(customerData) {
     // Process checkout data here
     this.items = this.cartService.clearCart();
-    this.checkoutForm.reset();
-
     console.warn('Your order has been submitted', customerData);
   }
+
+  removeFromCart(item) {
+    this.cartService.removeFromCart(item);
+    window.alert('Your product has been removed from the cart!');
+  }
+
+  updateCartItem(item, event) {
+    item.quantity = event.target.value;
+    console.log("item.quantity: "+item.quantity);
+    this.cartService.updateQuantity(item);
+    window.alert('Your product has been updated in the cart!');
+  }
+
+  async delay(ms: number) {
+    await new Promise(resolve => setTimeout(()=>resolve(), ms)).then(()=>console.log("fired"));
+  }
+
 }

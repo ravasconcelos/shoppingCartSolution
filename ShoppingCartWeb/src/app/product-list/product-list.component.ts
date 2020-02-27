@@ -32,6 +32,7 @@ export class ProductListComponent {
   }
 
   buy(product) {
+    product.quantity = 1;
     this.cartService.addToCart(product);
     window.alert('Your product has been added to the cart!');
   }

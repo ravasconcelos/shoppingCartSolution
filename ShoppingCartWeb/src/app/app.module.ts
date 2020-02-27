@@ -11,6 +11,8 @@ import { ProductDetailsComponent } from './product-details/product-details.compo
 import { CartService } from './cart.service';
 import { ProductService } from './product.service';
 import { CartComponent } from './cart/cart.component';
+import { CheckoutComponent } from './checkout/checkout.component';
+import { OrderComponent } from './order/order.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ShippingComponent } from './shipping/shipping.component';
 
@@ -23,6 +25,8 @@ import { ShippingComponent } from './shipping/shipping.component';
       { path: '', component: ProductListComponent },
       { path: 'products/:productId', component: ProductDetailsComponent },   
       { path: 'cart', component: CartComponent },
+      { path: 'checkout', component: CheckoutComponent },
+      { path: 'order', component: OrderComponent },
       { path: 'shipping', component: ShippingComponent },   
     ])
   ],
@@ -33,6 +37,8 @@ import { ShippingComponent } from './shipping/shipping.component';
     ProductAlertsComponent,
     ProductDetailsComponent,
     CartComponent,
+    CheckoutComponent,
+    OrderComponent,
     ShippingComponent
   ],
   bootstrap: [ AppComponent ],

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Cart } from './cart';
+import { Product } from './product';
 import { CartItem } from './cartItem';
 import { Observable } from 'rxjs';
 
@@ -12,14 +13,25 @@ export class CartService {
 
   constructor(private http: HttpClient) { 
     console.log('CartService.constructor');
-    this.createCart().subscribe(resp => {
-      console.log(resp);
-      const keys = resp.headers.keys();
-      console.log(keys);
-  
-      this.cart = resp.body;
-      console.log(this.cart);
-    });
+
+    let storedCartId = localStorage.getItem('cartId');
+    console.log('storedCartId: '+storedCartId);
+    if (storedCartId == null) {
+      this.createCart().subscribe(resp => {
+        console.log(resp);
+        const keys = resp.headers.keys();
+        console.log(keys);
+    
+        this.cart = resp.body;
+        console.log(this.cart);
+        localStorage.setItem('cartId', ""+this.cart.id);
+      });
+    } else {
+      this.cart = new Cart();
+      this.cart.id = +storedCartId;
+      this.getShoppingCart();
+    }
+
     console.log('CartService.constructor finished');
   }
 
@@ -41,6 +53,27 @@ export class CartService {
       { observe: 'response' });
   }
 
+  removeCartItem(cartItem: CartItem): Observable<HttpResponse<Cart>> {
+    console.log('CartService.removeCartItem will trigger Backend');
+    return this.http.delete<Cart>(
+      'http://localhost:8200/shoppingcart-api/carts/'+cartItem.cartId+'/items/'+cartItem.id,
+      { observe: 'response' });
+  }
+
+  submitCart(cart: Cart): Observable<HttpResponse<Cart>> {
+    console.log('CartService.submitCart will trigger Backend');
+    return this.http.post<Cart>(
+      'http://localhost:8200/shoppingcart-api/carts/'+cart.id+'/submit', null,
+      { observe: 'response' });
+  }
+
+  updateCartItem(cartItem: CartItem): Observable<HttpResponse<Cart>> {
+    console.log('CartService.updateCartItem will trigger Backend');
+    return this.http.put<Cart>(
+      'http://localhost:8200/shoppingcart-api/carts/'+cartItem.cartId+'/items/'+cartItem.id, cartItem,
+      { observe: 'response' });
+  }
+  
   createCartItem(cartItem: CartItem): Observable<HttpResponse<Cart>> {
     console.log('CartService.createCartItem will trigger Backend');
     return this.http.post<Cart>(
@@ -48,14 +81,13 @@ export class CartService {
       { observe: 'response' });
   }
 
-  addToCart(product) {
-    this.items.push(product);
+  addToCart(product: Product) {
 
     var cartItem: CartItem = new CartItem();
     cartItem.cartId = this.cart.id;
     cartItem.productId = product.id;
     cartItem.price = product.price;
-    cartItem.quantity = 1;
+    cartItem.quantity = product.quantity;
     this.cart.items.push(cartItem);
 
     console.log('CartService.addToCart will call createCartItem');
@@ -68,7 +100,38 @@ export class CartService {
     });
     console.log('CartService.addToCart finished');
 
+    this.items = this.cart.items;
+
     this.productMap.set(product.id, product);
+  }
+  
+  removeFromCart(cartItem: CartItem) {
+
+    console.log('CartService.removeFromCart will call removeCartItem');
+    this.removeCartItem(cartItem).subscribe(resp => {
+      console.log(resp);
+      const keys = resp.headers.keys();
+      console.log(keys);
+      console.log(resp.body);
+    });
+    console.log('CartService.removeCartItem finished');
+  }
+  
+  updateQuantity(cartItem: CartItem) {
+
+    console.log('CartService.updateQuantity will call updateCartItem');
+    this.updateCartItem(cartItem).subscribe(resp => {
+      console.log(resp);
+      const keys = resp.headers.keys();
+      console.log(keys);
+      console.log(resp.body);
+    });
+
+    console.log('CartService.updateQuantity will call getShoppingCart');
+
+    this.getShoppingCart();
+
+    console.log('CartService.updateQuantity finished');
   }
   
   getItems() {
@@ -76,6 +139,7 @@ export class CartService {
   }
 
   getProductMap() {
+    console.log("this.productMap: "+this.productMap);
     return this.productMap;
   }
   
@@ -93,8 +157,16 @@ export class CartService {
   }
 
   clearCart() {
-    this.items = [];
-    return this.items;
+
+    console.log('clearCart');
+    this.createCart().subscribe(resp => {
+      this.cart = resp.body;
+      this.items = this.cart.items;
+      console.log(this.cart);
+      localStorage.setItem('cartId', ""+this.cart.id);
+      console.log('clearCart createCart finished');
+    });
+    console.log('clearCart finished');
   }
 
   getShippingPrices() {

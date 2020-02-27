@@ -1,26 +1,20 @@
 <h3>Cart ID:{{ cart.id }}</h3>
 
-<div class="cart-item" *ngFor="let item of cart.items">
-  <span>{{ productMap.get(item.productId).name }}</span>
-  <span>{{ item.price | currency }}</span>
-</div>
+<table class="table" >
+    <tr>
+      <th>Item</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Action</th>
+    </tr>
+    <tr *ngFor="let item of cart.items">
+      <td>{{ productMap.get(item.productId).name }}</td>
+      <td>{{ item.price | currency }}</td>
+      <td><input id="quantity" type="number" value="{{ item.quantity }}" min="1" max="12" style="width: 4em;" (change)="updateCartItem(item, $event)" /></td>
+      <td>
+        <button class="button fancy-button" (click)="removeFromCart(item)"><i class="material-icons">delete</i></button>
+      </td>
+    </tr>
+</table>
 
-<form [formGroup]="checkoutForm" (ngSubmit)="onSubmit(checkoutForm.value)">
-
-  <div>
-    <label for="name">
-      Customer Name
-    </label>
-    <input id="name" type="text" formControlName="name">
-  </div>
-
-  <div>
-    <label for="address">
-      Customer Address
-    </label>
-    <input id="address" type="text" formControlName="address">
-  </div>
-  
-  <button class="button" type="submit">Purchase</button>
-
-</form>
+<a [routerLink]="['/checkout']" class="button fancy-button"><i class="material-icons">payment</i>Checkout</a>

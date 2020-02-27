@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -159,6 +160,22 @@ public class ShoppingCartServicesController {
         }
 
         this.cartItemService.deleteCartItem(cartItemModel.get());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{cartId}/submit")
+    public ResponseEntity<Void> submitCart(@PathVariable Long cartId) {
+
+        Optional<CartModel> cartModel = cartService.getCart(cartId);
+        if (!cartModel.isPresent()) {
+            throw new RuntimeException("Cart " + cartId + " does not exist");
+        }
+
+        cartModel.get().setStatus("Submitted");
+        cartModel.get().setOrderId(new Long(new Random().nextInt(9999999)));
+
+        cartService.createOrUpdateCart(cartModel.get());
 
         return ResponseEntity.noContent().build();
     }

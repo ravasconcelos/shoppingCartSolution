@@ -1,0 +1,37 @@
+<h2>Checkout</h2>
+<h3>Cart ID:{{ cart.id }}</h3>
+
+<table class="table" >
+    <tr>
+      <th>Item</th>
+      <th>Price</th>
+      <th>Quantity</th>
+    </tr>
+    <tr *ngFor="let item of cart.items">
+      <td>{{ productMap.get(item.productId).name }}</td>
+      <td>{{ item.price | currency }}</td>
+      <td>{{ item.quantity }}</td>
+    </tr>
+</table>
+
+<form [formGroup]="checkoutForm" (ngSubmit)="onSubmit(checkoutForm.value)">
+
+  <div>
+    <h3>Customer Details</h3>
+    <div>
+      <label for="name">
+        Customer Name
+      </label>
+      <input id="name" type="text" formControlName="name">
+    </div>
+
+    <div>
+      <label for="address">
+        Customer Address
+      </label>
+      <input id="address" type="text" formControlName="address">
+    </div>
+  </div>  
+  <button class="button" type="submit">Order</button>
+
+</form>

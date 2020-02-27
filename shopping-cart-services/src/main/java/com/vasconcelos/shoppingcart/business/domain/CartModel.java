@@ -21,14 +21,15 @@ public class CartModel {
     private Long id;
     private String status;
     private List<CartItemModel> items;
+    private Long orderId;
 
     public Cart toCartEntity() {
-        Cart cart = Cart.builder().id(id).status(status).build();
+        Cart cart = Cart.builder().id(id).status(status).orderId(orderId).build();
         return cart;
     }
 
     public static CartModel fromCartEntity(Cart cart) {
-        return CartModel.builder().id(cart.getId()).status(cart.getStatus()).build();
+        return CartModel.builder().id(cart.getId()).status(cart.getStatus()).orderId(cart.getOrderId()).build();
     }
 
 }
