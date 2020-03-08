@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.vasconcelos.catalog.business.domain.ProductModel;
@@ -29,6 +30,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable("products")
     public List<ProductModel> getAllProducts() {
         log.trace("getAllProducts");
         List<Product> products = this.productRepository.findAll();
@@ -43,6 +45,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable("product")
     public Optional<ProductModel> getProduct(Long id) {
         log.trace("getProduct id:" + id);
         Optional<Product> product = this.productRepository.findById(id);
